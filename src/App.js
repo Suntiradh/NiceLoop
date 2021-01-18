@@ -15,12 +15,6 @@ function App() {
   let userMap = new Map()
   let resultQ3 = []
 
-  function isPrime(num) {
-    for (var i = 2; i < num; i++)
-      if (num % i === 0) return false;
-    return num > 1;
-  }
-
 
   function summaryN(arg) {
     let num1 = arg.sort((a, b) => a - b);
