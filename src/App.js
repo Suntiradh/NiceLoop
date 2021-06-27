@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-
 const data = {
   name: "Premier League 2014/15",
   rounds: [
@@ -3237,60 +3235,119 @@ const data = {
 };
 
 function App() {
-  let result = {};
+  let result = [];
   for (let rounds of data.rounds) {
     for (let match of rounds.matches) {
-      let team1 = result[match.team1],
-        team2 = result[match.team2];
-
+      let team1 = result[match.team1];
+      let team2 = result[match.team2];
       if (team1 && team2) {
       } else {
         //initial
         team1 = {
           teamName: match.team1,
+          match: 0,
           score: 0,
           win: 0,
           lose: 0,
           draw: 0,
           point: 0,
+          ga: 0,
+          gd: 0,
         };
 
         team2 = {
           teamName: match.team2,
+          match: 0,
           score: 0,
           win: 0,
           lose: 0,
           draw: 0,
           point: 0,
+          ga: 0,
+          gd: 0,
         };
       }
 
       if (match.score.ft[0] < match.score.ft[1]) {
         /// lose
-        team1.lose = team1.lose + 1;
-        team2.win = team2.win + 1;
+        team1.lose += 1;
+        team2.win += 1;
       } else if (match.score.ft[0] > match.score.ft[1]) {
         //win
-        team1.win = team1.win + 1;
-        team2.lose = team2.lose + 1;
+        team1.win += 1;
+        team2.lose +=  1;
       } else {
         // draw
-        team1.draw = team1.draw + 1;
-        team2.draw = team2.draw + 1;
+        team1.draw += 1;
+        team2.draw += 1;
       }
+      //total match
+      team1.match += 1;
+      team2.match += 1;
 
-      team1.score = team1.score + match.score.ft[0];
+      //total score
+      team1.score += match.score.ft[0];
+      team2.score += match.score.ft[1];
+
+      //total ga
+      team1.ga += match.score.ft[1];
+      team2.ga += match.score.ft[0];
+
+      //total gd
+      team1.gd = team1.score - team1.ga;
+      team2.gd = team2.score - team2.ga;
+
+      //total point
       team1.point = team1.win * 3 + team1.lose * 0 + team1.draw * 1;
-      team2.score = team2.score + match.score.ft[1];
       team2.point = team2.win * 3 + team2.lose * 0 + team2.draw * 1;
 
       result[match.team1] = { ...team1 };
       result[match.team2] = { ...team2 };
     }
-    console.log(result);
   }
 
-  return <div></div>;
+  //insert data to array
+  let allTotal = [];
+  for (var key in result) {
+    allTotal.push(result[key]);
+  }
+
+  //sorting
+  allTotal.sort((a, b) => {
+    return b.point - a.point;
+  });
+
+  let tableTitle = {word:["Club", "MP", "W", "D", "L", "GF", "GA", "GD", "Pts"]};
+
+  return (
+    <div>
+      <br />
+      <table
+        border="1"
+        cellSpacing="0"
+        width="60%"
+        align="center"
+        border-cellSpacing="0"
+      >
+        <tr bgcolor="#f59b4f">
+        {tableTitle.word.map(data => <td style={{ textAlign: "center" }}><strong>{data}</strong></td>)}
+        </tr>
+        {allTotal.map((datas) => (
+          <tr bgcolor="#dddddd">
+            <td width="250">{datas.teamName}</td>
+            <td style={{ textAlign: "center" }}>{datas.match}</td>
+            <td style={{ textAlign: "center" }}>{datas.win}</td>
+            <td style={{ textAlign: "center" }}>{datas.draw}</td>
+            <td style={{ textAlign: "center" }}>{datas.lose}</td>
+            <td style={{ textAlign: "center" }}>{datas.score}</td>
+            <td style={{ textAlign: "center" }}>{datas.ga}</td>
+            <td style={{ textAlign: "center" }}>{datas.gd}</td>
+            <td style={{ textAlign: "center" }}>{datas.point}</td>
+          </tr>
+        ))}
+      </table>
+    </div>
+  );
 }
 
 export default App;
